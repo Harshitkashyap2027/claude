@@ -141,6 +141,177 @@ The new Python `src/` tree currently provides:
 - **`query_engine.py`** — renders a Python porting summary from the active workspace
 - **`main.py`** — a CLI entrypoint for manifest and summary output
 
+## Local Setup — Run the Agent on Your Computer
+
+Follow the steps below to clone the repository and run the agent locally on **Linux, macOS, or Windows (WSL)**.
+
+### Prerequisites
+
+| Requirement | Version | Notes |
+|---|---|---|
+| **Python** | 3.9 or newer | `python3 --version` to check |
+| **Git** | any recent version | used to clone the repo |
+| **Rust + Cargo** *(optional)* | stable channel | only needed for the Rust `claw` CLI |
+
+Install Python on Ubuntu/Debian:
+
+```bash
+sudo apt update && sudo apt install -y python3 python3-pip git
+```
+
+Install Python on macOS (with Homebrew):
+
+```bash
+brew install python git
+```
+
+Install Rust (all platforms):
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source "$HOME/.cargo/env"
+```
+
+---
+
+### Step 1 — Clone the repository
+
+```bash
+git clone https://github.com/Harshitkashyap2027/claude.git
+cd claude
+```
+
+---
+
+### Step 2 — (Optional) Create a virtual environment
+
+Using a virtual environment keeps your system Python clean:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+```
+
+---
+
+### Step 3 — Run the Python agent
+
+No additional packages need to be installed — the workspace uses only the Python standard library.
+
+**Print a summary of the agent workspace:**
+
+```bash
+python3 -m src.main summary
+```
+
+**List available commands:**
+
+```bash
+python3 -m src.main commands --limit 20
+```
+
+**List available tools:**
+
+```bash
+python3 -m src.main tools --limit 20
+```
+
+**Route a prompt through the agent (command + tool matching):**
+
+```bash
+python3 -m src.main route "review my code for security issues" --limit 5
+```
+
+**Run an interactive turn-loop session (multi-turn agent):**
+
+```bash
+python3 -m src.main turn-loop "explain the project structure" --max-turns 3
+```
+
+**Bootstrap a full agent session from a prompt:**
+
+```bash
+python3 -m src.main bootstrap "help me write a bash script" --limit 5
+```
+
+**Execute a specific agent command by name:**
+
+```bash
+python3 -m src.main exec-command review "check authentication logic"
+```
+
+**Execute a specific tool by name:**
+
+```bash
+python3 -m src.main exec-tool MCPTool "list available resources"
+```
+
+**Show the setup/prefetch report:**
+
+```bash
+python3 -m src.main setup-report
+```
+
+**Save (flush) a session transcript to disk:**
+
+```bash
+python3 -m src.main flush-transcript "summarize the repository"
+```
+
+---
+
+### Step 4 — (Optional) Build and run the Rust `claw` CLI
+
+The Rust port provides a full interactive REPL with streaming API support, MCP integration, and a plugin system.
+
+```bash
+cd rust
+cargo build --release
+./target/release/claw --help
+```
+
+Run the interactive REPL:
+
+```bash
+./target/release/claw
+```
+
+---
+
+### Step 5 — Run the test suite
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+All tests live in `tests/` and use only the Python standard library, so no extra setup is required.
+
+---
+
+### Command Reference
+
+| Command | Description |
+|---|---|
+| `summary` | Render a Markdown workspace summary |
+| `manifest` | Print the current module manifest |
+| `subsystems --limit N` | List top-level Python modules |
+| `commands --limit N` | List mirrored command entries |
+| `tools --limit N` | List mirrored tool entries |
+| `route <prompt>` | Match a prompt to commands/tools |
+| `bootstrap <prompt>` | Bootstrap a full agent session |
+| `turn-loop <prompt> --max-turns N` | Run a stateful multi-turn loop |
+| `exec-command <name> <prompt>` | Execute a command shim by name |
+| `exec-tool <name> <payload>` | Execute a tool shim by name |
+| `flush-transcript <prompt>` | Persist a session transcript |
+| `load-session <id>` | Reload a persisted session |
+| `setup-report` | Show startup/prefetch report |
+| `parity-audit` | Audit Python vs archived snapshot |
+| `command-graph` | Show command graph segmentation |
+| `tool-pool` | Show assembled tool pool |
+| `bootstrap-graph` | Show bootstrap/runtime graph stages |
+
+---
+
 ## Quickstart
 
 Render the Python porting summary:
